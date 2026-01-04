@@ -5132,3 +5132,58 @@ if (document.readyState === 'loading') {
     // DOM already ready
     initLanguageSelector();
 }
+
+/* Additional micro-interactions and hero parallax */
+(function(){
+    // simple parallax for hero video on scroll (subtle)
+    const heroVideo = document.getElementById('hero-video');
+    if(heroVideo){
+        let ticking = false;
+        const onScroll = () => {
+            if(!ticking){
+                window.requestAnimationFrame(() => {
+                    const y = window.scrollY || window.pageYOffset;
+                    // small movement range for subtle effect
+                    const move = Math.max(Math.min(y * 0.12, 120), -60);
+                    heroVideo.style.transform = `translateY(${move}px)`;
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        window.addEventListener('scroll', onScroll, {passive: true});
+        // initial frame
+        onScroll();
+    }
+
+    // hero form: small feedback + notification
+    const heroForm = document.getElementById('hero-form');
+    if(heroForm){
+        heroForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = heroForm.querySelector('.send-btn');
+            if(btn) {
+                btn.disabled = true;
+                btn.classList.add('sending');
+            }
+            // emulate async submit
+            setTimeout(() => {
+                if(btn){ btn.disabled = false; btn.classList.remove('sending'); }
+                const note = document.createElement('div');
+                note.className = 'notification show';
+                note.textContent = "Rahmat! Elektron pochta qabul qilindi.";
+                document.body.appendChild(note);
+                setTimeout(()=> note.classList.remove('show'), 2000);
+                setTimeout(()=> note.remove(), 2600);
+                heroForm.reset();
+            }, 900);
+        });
+    }
+
+    // keyboard focus visibility toggle for accessibility
+    function handleFirstTab(e){
+        if(e.key === 'Tab') document.body.classList.add('show-focus');
+    }
+    window.addEventListener('keydown', handleFirstTab, {once: true});
+
+})();
